@@ -1,0 +1,1005 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title>Fair Districts Akron Hub: Presumably Valid Signatures by Precinct</title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="data/UnaffiliatedVoters_1.js"></script>
+        <script src="data/RepublicanVoters_2.js"></script>
+        <script src="data/DemocraticVoters_3.js"></script>
+        <script src="data/AllVoters_4.js"></script>
+        <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+
+            if (e.target.feature.geometry.type === 'LineString') {
+              highlightLayer.setStyle({
+                color: '#ffff00',
+              });
+            } else {
+              highlightLayer.setStyle({
+                fillColor: '#ffff00',
+                fillOpacity: 1
+              });
+            }
+        }
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:1
+        })
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+            if (bounds_group.getLayers().length) {
+                map.fitBounds(bounds_group.getBounds());
+            }
+        }
+        map.createPane('pane_GoogleRoad_0');
+        map.getPane('pane_GoogleRoad_0').style.zIndex = 400;
+        var layer_GoogleRoad_0 = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            pane: 'pane_GoogleRoad_0',
+            opacity: 1.0,
+            attribution: '<a href="https://www.google.at/permissions/geoguidelines/attr-guide.html">Map data ©2015 Google</a>',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 20
+        });
+        layer_GoogleRoad_0;
+        map.addLayer(layer_GoogleRoad_0);
+        function pop_UnaffiliatedVoters_1(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Precinct</th>\
+                        <td>' + (feature.properties['CNPSigs — Sheet1_Precinct'] !== null ? autolinker.link(feature.properties['CNPSigs — Sheet1_Precinct'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Registered Voters (Un)</th>\
+                        <td>' + (feature.properties['CNPSigs — Sheet1_RegN'] !== null ? autolinker.link(feature.properties['CNPSigs — Sheet1_RegN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Signatures (Un)</th>\
+                        <td>' + (feature.properties['CNPSigs — Sheet1_SignaturesN'] !== null ? autolinker.link(feature.properties['CNPSigs — Sheet1_SignaturesN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">% of Unaffiliated Signed</th>\
+                        <td>' + (feature.properties['CNPSigs — Sheet1_%Non_1'] !== null ? autolinker.link(feature.properties['CNPSigs — Sheet1_%Non_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_UnaffiliatedVoters_1_0(feature) {
+            switch(String(feature.properties['q2wHide_CNPSigs — Sheet1_NonColor'])) {
+                case '#5A5A5A':
+                    return {
+                pane: 'pane_UnaffiliatedVoters_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(90,90,90,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#696969':
+                    return {
+                pane: 'pane_UnaffiliatedVoters_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(105,105,105,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#787878':
+                    return {
+                pane: 'pane_UnaffiliatedVoters_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(120,120,120,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#878787':
+                    return {
+                pane: 'pane_UnaffiliatedVoters_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(135,135,135,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#969696':
+                    return {
+                pane: 'pane_UnaffiliatedVoters_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(150,150,150,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#A5A5A5':
+                    return {
+                pane: 'pane_UnaffiliatedVoters_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(165,165,165,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#B4B4B4':
+                    return {
+                pane: 'pane_UnaffiliatedVoters_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(180,180,180,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#C3C3C3':
+                    return {
+                pane: 'pane_UnaffiliatedVoters_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(195,195,195,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#D2D2D2':
+                    return {
+                pane: 'pane_UnaffiliatedVoters_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(210,210,210,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#E1E1E1':
+                    return {
+                pane: 'pane_UnaffiliatedVoters_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(225,225,225,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#F0F0F0':
+                    return {
+                pane: 'pane_UnaffiliatedVoters_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(240,240,240,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#FFFFFF':
+                    return {
+                pane: 'pane_UnaffiliatedVoters_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_UnaffiliatedVoters_1');
+        map.getPane('pane_UnaffiliatedVoters_1').style.zIndex = 401;
+        map.getPane('pane_UnaffiliatedVoters_1').style['mix-blend-mode'] = 'normal';
+        var layer_UnaffiliatedVoters_1 = new L.geoJson(json_UnaffiliatedVoters_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_UnaffiliatedVoters_1',
+            layerName: 'layer_UnaffiliatedVoters_1',
+            pane: 'pane_UnaffiliatedVoters_1',
+            onEachFeature: pop_UnaffiliatedVoters_1,
+            style: style_UnaffiliatedVoters_1_0,
+        });
+        bounds_group.addLayer(layer_UnaffiliatedVoters_1);
+        map.addLayer(layer_UnaffiliatedVoters_1);
+        function pop_RepublicanVoters_2(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Precinct</th>\
+                        <td>' + (feature.properties['CNPSigs — Sheet1_Precinct'] !== null ? autolinker.link(feature.properties['CNPSigs — Sheet1_Precinct'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Registered Republicans</th>\
+                        <td>' + (feature.properties['CNPSigs — Sheet1_RegR'] !== null ? autolinker.link(feature.properties['CNPSigs — Sheet1_RegR'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Signatures (R)</th>\
+                        <td>' + (feature.properties['CNPSigs — Sheet1_SignaturesR'] !== null ? autolinker.link(feature.properties['CNPSigs — Sheet1_SignaturesR'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">% of Republicans Signed</th>\
+                        <td>' + (feature.properties['CNPSigs — Sheet1_%Rs_1'] !== null ? autolinker.link(feature.properties['CNPSigs — Sheet1_%Rs_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_RepublicanVoters_2_0(feature) {
+            switch(String(feature.properties['q2wHide_CNPSigs — Sheet1_Rcolor'])) {
+                case '#A40000':
+                    return {
+                pane: 'pane_RepublicanVoters_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(164,0,0,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#AC1717':
+                    return {
+                pane: 'pane_RepublicanVoters_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(172,23,23,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#B52E2E':
+                    return {
+                pane: 'pane_RepublicanVoters_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(181,46,46,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#BD4646':
+                    return {
+                pane: 'pane_RepublicanVoters_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(189,70,70,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#C55D5D':
+                    return {
+                pane: 'pane_RepublicanVoters_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(197,93,93,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#CD7474':
+                    return {
+                pane: 'pane_RepublicanVoters_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(205,116,116,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#D68B8B':
+                    return {
+                pane: 'pane_RepublicanVoters_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(214,139,139,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#DEA2A2':
+                    return {
+                pane: 'pane_RepublicanVoters_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(222,162,162,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#E6B9B9':
+                    return {
+                pane: 'pane_RepublicanVoters_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(230,185,185,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#EED1D1':
+                    return {
+                pane: 'pane_RepublicanVoters_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(238,209,209,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#F7E8E8':
+                    return {
+                pane: 'pane_RepublicanVoters_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(247,232,232,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#FFFFFF':
+                    return {
+                pane: 'pane_RepublicanVoters_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_RepublicanVoters_2');
+        map.getPane('pane_RepublicanVoters_2').style.zIndex = 402;
+        map.getPane('pane_RepublicanVoters_2').style['mix-blend-mode'] = 'normal';
+        var layer_RepublicanVoters_2 = new L.geoJson(json_RepublicanVoters_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_RepublicanVoters_2',
+            layerName: 'layer_RepublicanVoters_2',
+            pane: 'pane_RepublicanVoters_2',
+            onEachFeature: pop_RepublicanVoters_2,
+            style: style_RepublicanVoters_2_0,
+        });
+        bounds_group.addLayer(layer_RepublicanVoters_2);
+        map.addLayer(layer_RepublicanVoters_2);
+        function pop_DemocraticVoters_3(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Precinct</th>\
+                        <td>' + (feature.properties['CNPSigs — Sheet1_Precinct'] !== null ? autolinker.link(feature.properties['CNPSigs — Sheet1_Precinct'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Registered Democrats</th>\
+                        <td>' + (feature.properties['CNPSigs — Sheet1_RegD'] !== null ? autolinker.link(feature.properties['CNPSigs — Sheet1_RegD'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Signatures (D)</th>\
+                        <td>' + (feature.properties['CNPSigs — Sheet1_Signatures D'] !== null ? autolinker.link(feature.properties['CNPSigs — Sheet1_Signatures D'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">% of Democrats Signed</th>\
+                        <td>' + (feature.properties['CNPSigs — Sheet1_%Ds_1'] !== null ? autolinker.link(feature.properties['CNPSigs — Sheet1_%Ds_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_DemocraticVoters_3_0(feature) {
+            switch(String(feature.properties['q2wHide_CNPSigs — Sheet1_Dcolor'])) {
+                case '#00008B':
+                    return {
+                pane: 'pane_DemocraticVoters_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(0,0,139,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#171796':
+                    return {
+                pane: 'pane_DemocraticVoters_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(23,23,150,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#2E2EA0':
+                    return {
+                pane: 'pane_DemocraticVoters_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(46,46,160,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#4646AB':
+                    return {
+                pane: 'pane_DemocraticVoters_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(70,70,171,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#5D5DB5':
+                    return {
+                pane: 'pane_DemocraticVoters_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(93,93,181,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#7474C0':
+                    return {
+                pane: 'pane_DemocraticVoters_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(116,116,192,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#8B8BCA':
+                    return {
+                pane: 'pane_DemocraticVoters_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(139,139,202,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#A2A2D5':
+                    return {
+                pane: 'pane_DemocraticVoters_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(162,162,213,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#B9B9DF':
+                    return {
+                pane: 'pane_DemocraticVoters_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(185,185,223,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#D1D1EA':
+                    return {
+                pane: 'pane_DemocraticVoters_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(209,209,234,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#E8E8F4':
+                    return {
+                pane: 'pane_DemocraticVoters_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(232,232,244,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#FFFFFF':
+                    return {
+                pane: 'pane_DemocraticVoters_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_DemocraticVoters_3');
+        map.getPane('pane_DemocraticVoters_3').style.zIndex = 403;
+        map.getPane('pane_DemocraticVoters_3').style['mix-blend-mode'] = 'normal';
+        var layer_DemocraticVoters_3 = new L.geoJson(json_DemocraticVoters_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_DemocraticVoters_3',
+            layerName: 'layer_DemocraticVoters_3',
+            pane: 'pane_DemocraticVoters_3',
+            onEachFeature: pop_DemocraticVoters_3,
+            style: style_DemocraticVoters_3_0,
+        });
+        bounds_group.addLayer(layer_DemocraticVoters_3);
+        map.addLayer(layer_DemocraticVoters_3);
+        function pop_AllVoters_4(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Precinct</th>\
+                        <td>' + (feature.properties['CNPSigs — Sheet1_Precinct'] !== null ? autolinker.link(feature.properties['CNPSigs — Sheet1_Precinct'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Registered Voters</th>\
+                        <td>' + (feature.properties['CNPSigs — Sheet1_Registered'] !== null ? autolinker.link(feature.properties['CNPSigs — Sheet1_Registered'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Signatures</th>\
+                        <td>' + (feature.properties['CNPSigs — Sheet1_Signatures'] !== null ? autolinker.link(feature.properties['CNPSigs — Sheet1_Signatures'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">% of Voters Signed</th>\
+                        <td>' + (feature.properties['CNPSigs — Sheet1_%Voters_1'] !== null ? autolinker.link(feature.properties['CNPSigs — Sheet1_%Voters_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_AllVoters_4_0(feature) {
+            switch(String(feature.properties['q2wHide_CNPSigs — Sheet1_TotColor'])) {
+                case '#008000':
+                    return {
+                pane: 'pane_AllVoters_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(0,128,0,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#178C17':
+                    return {
+                pane: 'pane_AllVoters_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(23,140,23,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#2E972E':
+                    return {
+                pane: 'pane_AllVoters_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(46,151,46,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#46A346':
+                    return {
+                pane: 'pane_AllVoters_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(70,163,70,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#5DAE5D':
+                    return {
+                pane: 'pane_AllVoters_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(93,174,93,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#74BA74':
+                    return {
+                pane: 'pane_AllVoters_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(116,186,116,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#8BC58B':
+                    return {
+                pane: 'pane_AllVoters_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(139,197,139,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#A2D1A2':
+                    return {
+                pane: 'pane_AllVoters_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(162,209,162,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#B9DCB9':
+                    return {
+                pane: 'pane_AllVoters_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(185,220,185,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#D1E8D1':
+                    return {
+                pane: 'pane_AllVoters_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(209,232,209,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#E8F3E8':
+                    return {
+                pane: 'pane_AllVoters_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(232,243,232,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '#FFFFFF':
+                    return {
+                pane: 'pane_AllVoters_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_AllVoters_4');
+        map.getPane('pane_AllVoters_4').style.zIndex = 404;
+        map.getPane('pane_AllVoters_4').style['mix-blend-mode'] = 'normal';
+        var layer_AllVoters_4 = new L.geoJson(json_AllVoters_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_AllVoters_4',
+            layerName: 'layer_AllVoters_4',
+            pane: 'pane_AllVoters_4',
+            onEachFeature: pop_AllVoters_4,
+            style: style_AllVoters_4_0,
+        });
+        bounds_group.addLayer(layer_AllVoters_4);
+        map.addLayer(layer_AllVoters_4);
+            var title = new L.Control();
+            title.onAdd = function (map) {
+                this._div = L.DomUtil.create('div', 'info');
+                this.update();
+                return this._div;
+            };
+            title.update = function () {
+                this._div.innerHTML = '<h2>Fair Districts Akron Hub: Presumably Valid Signatures by Precinct</h2>';
+            };
+            title.addTo(map);
+        var baseMaps = {};
+        L.control.layers(baseMaps,{'% All Voters<br /><table><tr><td style="text-align: center;"><img src="legend/AllVoters_4_50.png" /></td><td>>5%</td></tr><tr><td style="text-align: center;"><img src="legend/AllVoters_4_4551.png" /></td><td>4.5-5%</td></tr><tr><td style="text-align: center;"><img src="legend/AllVoters_4_4452.png" /></td><td>4-4.5%</td></tr><tr><td style="text-align: center;"><img src="legend/AllVoters_4_3543.png" /></td><td>3.5-4%</td></tr><tr><td style="text-align: center;"><img src="legend/AllVoters_4_3354.png" /></td><td>3-3.5%</td></tr><tr><td style="text-align: center;"><img src="legend/AllVoters_4_2535.png" /></td><td>2.5-3%</td></tr><tr><td style="text-align: center;"><img src="legend/AllVoters_4_2256.png" /></td><td>2-2.5%</td></tr><tr><td style="text-align: center;"><img src="legend/AllVoters_4_1527.png" /></td><td>1.5-2%</td></tr><tr><td style="text-align: center;"><img src="legend/AllVoters_4_1158.png" /></td><td>1-1.5%</td></tr><tr><td style="text-align: center;"><img src="legend/AllVoters_4_0519.png" /></td><td>0.5-1%</td></tr><tr><td style="text-align: center;"><img src="legend/AllVoters_4_00510.png" /></td><td>0-0.5%</td></tr><tr><td style="text-align: center;"><img src="legend/AllVoters_4_011.png" /></td><td>0%</td></tr></table>': layer_AllVoters_4,'% Democratic Voters<br /><table><tr><td style="text-align: center;"><img src="legend/DemocraticVoters_3_250.png" /></td><td>>25%</td></tr><tr><td style="text-align: center;"><img src="legend/DemocraticVoters_3_225251.png" /></td><td>22.5-25%</td></tr><tr><td style="text-align: center;"><img src="legend/DemocraticVoters_3_202252.png" /></td><td>20-22.5%</td></tr><tr><td style="text-align: center;"><img src="legend/DemocraticVoters_3_175203.png" /></td><td>17.5-20%</td></tr><tr><td style="text-align: center;"><img src="legend/DemocraticVoters_3_151754.png" /></td><td>15-17.5%</td></tr><tr><td style="text-align: center;"><img src="legend/DemocraticVoters_3_125155.png" /></td><td>12.5-15%</td></tr><tr><td style="text-align: center;"><img src="legend/DemocraticVoters_3_101256.png" /></td><td>10-12.5%</td></tr><tr><td style="text-align: center;"><img src="legend/DemocraticVoters_3_75107.png" /></td><td>7.5-10%</td></tr><tr><td style="text-align: center;"><img src="legend/DemocraticVoters_3_5758.png" /></td><td>5-7.5%</td></tr><tr><td style="text-align: center;"><img src="legend/DemocraticVoters_3_2559.png" /></td><td>2.5-5%</td></tr><tr><td style="text-align: center;"><img src="legend/DemocraticVoters_3_02510.png" /></td><td>0-2.5%</td></tr><tr><td style="text-align: center;"><img src="legend/DemocraticVoters_3_011.png" /></td><td>0%</td></tr></table>': layer_DemocraticVoters_3,'% Republican Voters<br /><table><tr><td style="text-align: center;"><img src="legend/RepublicanVoters_2_750.png" /></td><td>>7.5%</td></tr><tr><td style="text-align: center;"><img src="legend/RepublicanVoters_2_675751.png" /></td><td>6.75-7.5%</td></tr><tr><td style="text-align: center;"><img src="legend/RepublicanVoters_2_66752.png" /></td><td>6-6.75%</td></tr><tr><td style="text-align: center;"><img src="legend/RepublicanVoters_2_52563.png" /></td><td>5.25-6%</td></tr><tr><td style="text-align: center;"><img src="legend/RepublicanVoters_2_455254.png" /></td><td>4.5-5.25%</td></tr><tr><td style="text-align: center;"><img src="legend/RepublicanVoters_2_375455.png" /></td><td>3.75-4.5%</td></tr><tr><td style="text-align: center;"><img src="legend/RepublicanVoters_2_33756.png" /></td><td>3-3.75%</td></tr><tr><td style="text-align: center;"><img src="legend/RepublicanVoters_2_22537.png" /></td><td>2.25-3%</td></tr><tr><td style="text-align: center;"><img src="legend/RepublicanVoters_2_152258.png" /></td><td>1.5-2.25%</td></tr><tr><td style="text-align: center;"><img src="legend/RepublicanVoters_2_075159.png" /></td><td>0.75-1.5%</td></tr><tr><td style="text-align: center;"><img src="legend/RepublicanVoters_2_007510.png" /></td><td>0-0.75%</td></tr><tr><td style="text-align: center;"><img src="legend/RepublicanVoters_2_011.png" /></td><td>0%</td></tr></table>': layer_RepublicanVoters_2,'% Unaffiliated Voters<br /><table><tr><td style="text-align: center;"><img src="legend/UnaffiliatedVoters_1_30.png" /></td><td>>3%</td></tr><tr><td style="text-align: center;"><img src="legend/UnaffiliatedVoters_1_2731.png" /></td><td>2.7-3%</td></tr><tr><td style="text-align: center;"><img src="legend/UnaffiliatedVoters_1_24272.png" /></td><td>2.4-2.7%</td></tr><tr><td style="text-align: center;"><img src="legend/UnaffiliatedVoters_1_21273.png" /></td><td>2.1-2.7%</td></tr><tr><td style="text-align: center;"><img src="legend/UnaffiliatedVoters_1_18214.png" /></td><td>1.8-2.1%</td></tr><tr><td style="text-align: center;"><img src="legend/UnaffiliatedVoters_1_15185.png" /></td><td>1.5-1.8%</td></tr><tr><td style="text-align: center;"><img src="legend/UnaffiliatedVoters_1_12156.png" /></td><td>1.2-1.5%</td></tr><tr><td style="text-align: center;"><img src="legend/UnaffiliatedVoters_1_09127.png" /></td><td>0.9-1.2%</td></tr><tr><td style="text-align: center;"><img src="legend/UnaffiliatedVoters_1_06098.png" /></td><td>0.6-0.9%</td></tr><tr><td style="text-align: center;"><img src="legend/UnaffiliatedVoters_1_03069.png" /></td><td>0.3-0.6%</td></tr><tr><td style="text-align: center;"><img src="legend/UnaffiliatedVoters_1_00310.png" /></td><td>0-0.3%</td></tr><tr><td style="text-align: center;"><img src="legend/UnaffiliatedVoters_1_011.png" /></td><td>0</td></tr></table>': layer_UnaffiliatedVoters_1,"Google Road": layer_GoogleRoad_0,},{collapsed:false}).addTo(map);
+        setBounds();
+        </script>
+    </body>
+</html>
